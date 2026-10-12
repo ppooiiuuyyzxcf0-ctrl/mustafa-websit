@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>موقع مصطفى علي | المبرمج 💻✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+        }
+
+        body.light-mode {
+            --bg-color: #f1f5f9;
+            --text-color: #0f172a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        body { 
+            position: relative;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            padding: 20px 15px; 
+            min-height: 100vh;
+        }
+        
+        .bg-video { position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%; z-index: 1; transform: translate(-50%, -50%); object-fit: cover; filter: brightness(0.85) contrast(1.1); transition: opacity 0.3s ease; }
+        #bgVideo2 { opacity: 0; }
+        
+        .sub-bg-video { position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%; z-index: 2; transform: translate(-50%, -50%); object-fit: cover; filter: brightness(0.85) contrast(1.1); opacity: 0; display: none; pointer-events: none; }
+        
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(0,0,0,0.02) 20%, rgba(0,0,0,0.45) 100%); z-index: 3; pointer-events: none; }
+
+        .shine-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analog-clock {
+            position: relative;
+            margin: 0 auto 15px auto;
+            z-index: 10;
+            width: 75px;
+            height: 75px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .clock-face { position: relative; width: 100%; height: 100%; border-radius: 50%; }
+
+        .clock-number {
+            position: absolute;
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+        }
+
+        .number-12 { top: 12%; left: 50%; }
+        .number-3  { top: 50%; left: 88%; }
+        .number-6  { top: 88%; left: 50%; }
+        .number-9  { top: 50%; left: 12%; }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            border-radius: 4px;
+            transition: transform 0.05s linear;
+        }
+
+        .hour-hand { width: 2.5px; height: 18px; background-color: #ffffff; transform: translateX(-50%) rotate(0deg); }
+        .minute-hand { width: 1.5px; height: 24px; background-color: rgba(255, 255, 255, 0.85); transform: translateX(-50%) rotate(0deg); }
+        .second-hand { width: 1px; height: 28px; background-color: #f472b6; transform: translateX(-50%) rotate(0deg); }
+        .clock-center { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background-color: #f472b6; border-radius: 50%; transform: translate(-50%, -50%); }
+
+        .top-nav { position: fixed; top: 15px; right: 15px; z-index: 30; display: flex; gap: 10px; align-items: center; }
+        .menu-btn, .audio-control-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s, background 0.2s; }
+        .menu-btn:active, .audio-control-btn:active { transform: scale(0.9); background: rgba(168, 85, 247, 0.3); }
+
+        .sidebar { position: fixed; top: 0; right: -280px; width: 260px; height: 100%; background: rgba(15, 10, 25, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-left: 1px solid rgba(168, 85, 247, 0.3); z-index: 40; padding: 60px 20px 20px 20px; display: flex; flex-direction: column; gap: 12px; transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.8); }
+        .sidebar.active { right: 0; }
+        .sidebar-item { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); padding: 14px; border-radius: 16px; color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .sidebar-item:active { background: rgba(168, 85, 247, 0.2); }
+        .close-sidebar { position: absolute; top: 18px; left: 18px; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; }
+
+        .welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 25px; overflow: hidden; }
+        .welcome-content { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; }
+        .welcome-title { font-size: 24px; font-weight: 900; color: #fff; line-height: 1.6; text-shadow: 0 0 25px rgba(255, 255, 255, 0.6); display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 30px; }
+        .word { display: inline-block; opacity: 0; transform: translateY(30px) scale(0.9); }
+
+        .ui-container { 
+            position: relative; 
+            z-index: 5; 
+            width: 100%; 
+            max-width: 340px; 
+            margin: auto; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+        
+        .main-card { 
+            position: relative;
+            background: rgba(255, 255, 255, 0.001); 
+            backdrop-filter: blur(2px); 
+            -webkit-backdrop-filter: blur(2px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-top: 1px solid rgba(255, 255, 255, 0.12); 
+            border-radius: 26px; 
+            padding: 30px 16px 18px 16px; 
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); 
+            width: 100%;
+        }
+        
+        h1 { font-size: 18px; font-weight: 900; margin-bottom: 3px; color: var(--text-color); text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9); }
+        p.sub-title { font-size: 12px; color: var(--text-color); opacity: 0.9; margin-bottom: 15px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9); }
+        
+        .btn-enter { background: linear-gradient(135deg, #7c3aed, #db2777); color: white; border: none; padding: 12px 20px; font-size: 13.5px; font-weight: 700; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 18px rgba(124, 58, 237, 0.4); width: 100%; outline: none; transition: transform 0.2s; }
+        .btn-welcome { opacity: 0; transform: translateY(40px); }
+        .btn-enter:active { transform: scale(0.95); }
+
+        .second-page, .sub-page { 
+            position: relative; 
+            z-index: 5; 
+            width: 100%; 
+            max-width: 340px; 
+            text-align: center; 
+            display: none; 
+            opacity: 0; 
+            margin: auto; 
+            padding-bottom: 50px;
+        }
+        
+        .second-card { 
+            position: relative;
+            background: rgba(255, 255, 255, 0.001); 
+            backdrop-filter: blur(2px); 
+            -webkit-backdrop-filter: blur(2px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-top: 1px solid rgba(255, 255, 255, 0.12); 
+            border-radius: 24px; 
+            padding: 16px 14px; 
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); 
+            margin-bottom: 12px; 
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .profile-3d-box { position: relative; width: 75px; height: 75px; margin: 0 auto 8px auto; z-index: 2; }
+        
+        .circle-video-box { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            overflow: hidden; 
+            border: 2px solid rgba(255, 255, 255, 0.4); 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
+        }
+        .circle-video-box img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+        
+        .neon-name { font-size: 18px; font-weight: 900; color: var(--text-color); display: inline-block; margin: 3px 0; }
+        .typewriter-box { font-size: 12px; color: var(--text-color); opacity: 0.95; line-height: 1.4; min-height: 35px; margin-top: 4px; font-weight: 500; }
+        .cursor { display: inline-block; width: 2px; height: 13px; background-color: #fff; margin-right: 3px; animation: blink 0.7s infinite; vertical-align: middle; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; margin-bottom: 12px; }
+        
+        .grid-card { 
+            position: relative;
+            width: 100%;
+            height: 115px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-top: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px; 
+            padding: 10px 6px; 
+            text-align: center; 
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); 
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .card-bg-img { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            object-position: top center !important; 
+            z-index: 0; 
+            filter: brightness(0.75) contrast(1.1); 
+        }
+
+        .card-bg-img.bg-fb { object-position: center 35% !important; }
+        .card-bg-img.bg-tg { object-position: center 55% !important; }
+
+        .grid-card:active { transform: scale(0.95); }
+        .card-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+        .app-icon-img { width: 30px; height: 30px; object-fit: contain; margin-bottom: 4px; }
+        .card-title { font-size: 12.5px; font-weight: 700; color: #ffffff; margin-bottom: 1px; }
+        .card-desc { font-size: 9.5px; color: #cbd5e1; opacity: 0.9; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 50; display: flex; justify-content: center; align-items: center; padding: 20px; opacity: 0; pointer-events: none; }
+        .modal-box { background: rgba(18, 10, 28, 0.92); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 24px; padding: 20px 18px; width: 100%; max-width: 310px; text-align: center; box-shadow: 0 0 35px rgba(124, 58, 237, 0.4); max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        .input-field, .textarea-field { width: 100%; padding: 11px 13px; margin: 3px 0; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 14px; color: #fff; font-size: 12.5px; text-align: center; outline: none; }
+        .textarea-field { height: 70px; resize: none; text-align: right; }
+        .error-msg { color: #ef4444; font-size: 11.5px; margin-bottom: 3px; display: none; font-weight: bold; }
+        .security-tag { font-size: 9.5px; color: rgba(255, 255, 255, 0.4); margin-top: 3px; }
+
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.08); width: 100%; }
+        .setting-title { font-size: 12px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 7px; }
+        .badge-soon { font-size: 9px; background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.35); padding: 3px 7px; border-radius: 20px; font-weight: bold; }
+
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #a855f7; }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        .policy-text { font-size: 11.5px; color: #cbd5e1; line-height: 1.6; text-align: right; margin: 5px 0; max-height: 200px; overflow-y: auto; }
+        .stars-container { display: flex; justify-content: center; gap: 7px; margin: 5px 0; direction: ltr; }
+        .star { font-size: 26px; color: rgba(255,255,255,0.2); cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .star.active { color: #facc15; transform: scale(1.1); }
+
+        .sub-card-mini { position: relative; background: transparent !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; padding: 8px 12px; margin-bottom: 12px; }
+        .page-direct-content { position: relative; z-index: 10; padding: 0 10px; }
+        .about-app-text-direct { font-size: 11.5px; color: #ffffff; line-height: 1.8; text-align: justify; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); }
+        .glass-user-btn-direct { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 12px 14px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 50px; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); transition: all 0.3s ease; margin-bottom: 10px; }
+        .connect-label { color: #f472b6; font-weight: 900; }
+        
+        .btn-exit-glass { position: relative; display: block; width: 100%; margin-top: 6px; background: rgba(255, 255, 255, 0.001); border: 1px solid rgba(255, 255, 255, 0.06); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); color: var(--text-color); padding: 12px 20px; font-size: 12.5px; font-weight: 700; border-radius: 50px; cursor: pointer; outline: none; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .btn-exit-glass:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body>
+
+    <audio id="bgAudio" loop preload="auto"><source src="audio.mp3" type="audio/mpeg"></audio>
+    <audio id="poemAudio" preload="auto"><source src="poem.mp3" type="audio/mpeg"></audio>
+    <audio id="instaPoem" preload="auto"><source src="insta-poem.mp3" type="audio/mpeg"></audio>
+    <audio id="fbPoem" preload="auto"><source src="facebook-poem.mp3" type="audio/mpeg"></audio>
+    <audio id="tgPoem" preload="auto"><source src="telegram-poem.mp3" type="audio/mpeg"></audio>
+    <audio id="ttPoem" preload="auto"><source src="tiktok-poem.mp3" type="audio/mpeg"></audio>
+
+    <div class="top-nav">
+        <button class="audio-control-btn" id="audioToggleBtn" onclick="toggleBackgroundAudio()" title="إيقاف/تشغيل الصوت">🔊</button>
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+        <div style="font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 8px;">خيارات الموقع ⚡</div>
+        <div class="sidebar-item" onclick="openModalById('settingsModal')">⚙️ الإعدادات</div>
+        <div class="sidebar-item" onclick="openModalById('privacyModal')">🔒 سياسة الخصوصية</div>
+        <div class="sidebar-item" onclick="toggleSidebar(); openFeedbackModal();" style="margin-top: auto; background: rgba(255, 255, 255, 0.03); border-color: rgba(236, 72, 153, 0.3);">
+            ↩️ خروج وتقييم
+        </div>
+    </div>
+
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <h2 class="welcome-title">
+                <span class="word">أهلاً</span><span class="word">وسهلاً</span><span class="word">بكم</span><span class="word">في</span><span class="word">موقع</span><span class="word">مصطفى</span><span class="word">✨</span>
+            </h2>
+            <button class="btn-enter btn-welcome" id="btnWelcome" onclick="startExperience()">انتقل إلى الموقع 🚀</button>
+        </div>
+    </div>
+
+    <video class="bg-video" id="bgVideo1" autoplay loop muted playsinline preload="auto"><source src="bg-video.mp4" type="video/mp4"></video>
+    <video class="bg-video" id="bgVideo2" loop muted playsinline preload="auto"><source src="bg-video2.mp4" type="video/mp4"></video>
+    
+    <video class="sub-bg-video" id="instaVideo" loop muted playsinline preload="auto"><source src="insta-profile.mp4" type="video/mp4"></video>
+    <video class="sub-bg-video" id="fbVideo" loop muted playsinline preload="auto"><source src="facebook-profile.mp4" type="video/mp4"></video>
+    <video class="sub-bg-video" id="tgVideo" loop muted playsinline preload="auto"><source src="telegram-profile.mp4" type="video/mp4"></video>
+    <video class="sub-bg-video" id="ttVideo" loop muted playsinline preload="auto"><source src="tiktok-profile.mp4" type="video/mp4"></video>
+    
+    <div class="overlay"></div>
+
+    <div class="ui-container" id="firstPage">
+        <div class="main-card shine-card">
+            <div class="analog-clock">
+                <div class="clock-face">
+                    <span class="clock-number number-12">12</span>
+                    <span class="clock-number number-3">3</span>
+                    <span class="clock-number number-6">6</span>
+                    <span class="clock-number number-9">9</span>
+                    <div class="hand hour-hand" id="hourHand"></div>
+                    <div class="hand minute-hand" id="minHand"></div>
+                    <div class="hand second-hand" id="secHand"></div>
+                    <div class="clock-center"></div>
+                </div>
+            </div>
+            <h1>أهلاً بأحبائي</h1>
+            <p class="sub-title">نورت الموقع ✨</p>
+            <button class="btn-enter" onclick="openModal()">دخول إلى موقع مصطفى 🔑</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <p style="font-size: 14.5px; color: #fff; font-weight: 900;">اكتب اسمك</p>
+            <input type="text" id="userName" class="input-field" placeholder="ادخل اسمك هنا..." oninput="sanitizeUserName(this)">
+            <div class="error-msg" id="errorMsg">⚠️ يرجى كتابة الاسم أولاً</div>
+            <button class="btn-enter" onclick="submitName()">تأكيد والدخول 🔑</button>
+            <div class="security-tag">🔒 يتم فحص الاسم وتأمينه بواسطة نظام مصطفى علي البرمجي</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-box">
+            <p style="font-size: 14.5px; color: #fff; font-weight: 900; margin-bottom: 2px;">إعدادات النظام ⚙️</p>
+            <div class="setting-row">
+                <div class="setting-title">🌙 الوضع الليلي / النهاري</div>
+                <label class="switch"><input type="checkbox" id="themeToggle" onchange="toggleTheme()"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <div class="setting-title">🔔 التنبيهات والإشعارات</div>
+                <span class="badge-soon">قريباً إن شاء الله ⏳</span>
+            </div>
+            <div class="setting-row">
+                <div class="setting-title">🌐 تغيير اللغة</div>
+                <span class="badge-soon">قريباً إن شاء الله ⏳</span>
+            </div>
+            <button class="btn-exit-glass" style="margin-top: 5px;" onclick="closeModalById('settingsModal')">إغلاق ✖</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-box">
+            <p style="font-size: 14.5px; color: #fff; font-weight: 900;">سياسة الخصوصية 🔒</p>
+            <div class="policy-text">
+                أهلاً بكم في موقع المبرمج <b>مصطفى علي</b>.<br><br>
+                • <b>حماية البيانات:</b> نحن نحترم خصوصيتكم بالكامل ونطبق خوارزميات أمان صارمة.<br>
+                • <b>حقوق الملكية:</b> كافة الأكواد مطورة حصرياً للمبرمج مصطفى علي.
+            </div>
+            <button class="btn-exit-glass" onclick="closeModalById('privacyModal')">إغلاق ✖</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="feedbackOverlay">
+        <div class="modal-box" id="feedbackBox">
+            <p style="font-size: 14.5px; color: #fff; font-weight: 900;">تقييم تجربتك ✨</p>
+            <p style="font-size: 10.5px; color: #e0e7ff; margin-top: 2px;">يرجى تقييم الموقع للمتابعة (إجباري)</p>
+            <div class="stars-container">
+                <span class="star" onclick="setRating(1)">★</span><span class="star" onclick="setRating(2)">★</span><span class="star" onclick="setRating(3)">★</span><span class="star" onclick="setRating(4)">★</span><span class="star" onclick="setRating(5)">★</span>
+            </div>
+            <textarea id="feedbackText" class="textarea-field" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+            <div class="error-msg" id="feedbackError" style="display:none; color:#ef4444; font-size:10.5px;">⚠️ يرجى اختيار التقييم بالنجوم أو كتابة ملاحظة!</div>
+            <button class="btn-enter" onclick="submitFeedback()">إرسال التقييم والخروج 🚀</button>
+        </div>
+    </div>
+    <div class="second-page" id="secondPage">
+        <div class="second-card shine-card stagger-item">
+            <div class="profile-3d-box">
+                <div class="circle-video-box">
+                    <img src="my-photo.png" alt="Mustafa Ali" id="userPhoto">
+                </div>
+            </div>
+            <p style="font-size: 11px; color: #a7f3d0; font-weight: 700;">✨ مرحباً بك ✨</p>
+            <div class="neon-name" id="userNameDisplay">زائرنا العزيز</div>
+            <div class="typewriter-box"><span id="typewriterText"></span><span class="cursor"></span></div>
+        </div>
+
+        <div class="cards-grid">
+            <div class="grid-card shine-card stagger-item" onclick="openSubPage('instagram')">
+                <img src="insta-profile.jpg" alt="Instagram BG" class="card-bg-img">
+                <div class="card-content">
+                    <img src="instagram-icon.png" alt="Instagram" class="app-icon-img">
+                    <div class="card-title">إنستغرام</div>
+                    <div class="card-desc">تابعني هناك..</div>
+                </div>
+            </div>
+
+            <div class="grid-card shine-card stagger-item" onclick="openSubPage('facebook')">
+                <img src="facebook-profile.jpg" alt="Facebook BG" class="card-bg-img bg-fb">
+                <div class="card-content">
+                    <img src="facebook-icon.png" alt="Facebook" class="app-icon-img">
+                    <div class="card-title">فيسبوك</div>
+                    <div class="card-desc">تواصل معي..</div>
+                </div>
+            </div>
+
+            <div class="grid-card shine-card stagger-item" onclick="openSubPage('telegram')">
+                <img src="telegram-profile.jpg" alt="Telegram BG" class="card-bg-img bg-tg">
+                <div class="card-content">
+                    <img src="telegram-icon.png" alt="Telegram" class="app-icon-img">
+                    <div class="card-title">تلغرام</div>
+                    <div class="card-desc">قناتي البرمجية..</div>
+                </div>
+            </div>
+
+            <div class="grid-card shine-card stagger-item" onclick="openSubPage('tiktok')">
+                <img src="tiktok-profile.jpg" alt="TikTok BG" class="card-bg-img">
+                <div class="card-content">
+                    <img src="tiktok-icon.png" alt="TikTok" class="app-icon-img">
+                    <div class="card-title">تيك توك</div>
+                    <div class="card-desc">فيديوهاتي..</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-exit-glass shine-card stagger-item" onclick="returnToFirstPage()">العودة ↩️</button>
+    </div>
+
+    <div class="sub-page" id="subPage">
+        <div class="sub-card-mini shine-card" id="subTiltCard">
+            <div class="profile-3d-box">
+                <div class="circle-video-box">
+                    <img id="subUserPic" src="insta-pic.png" alt="Profile Picture">
+                </div>
+            </div>
+            <div class="neon-name" id="subPageHeading">منصة التواصل</div>
+        </div>
+
+        <div class="page-direct-content">
+            <div class="about-app-text-direct" id="subAppDescription"></div>
+            <a href="#" id="socialUserBtn" class="glass-user-btn-direct shine-card" target="_blank">
+                <span id="userHandleText">@MustafaAli</span>
+                <span class="connect-label">| تواصل معي 🚀</span>
+            </a>
+            <button class="btn-exit-glass shine-card" onclick="closeSubPage()">العودة ↩️</button>
+        </div>
+    </div>
+            <script>
+        let isModalOpen = false;
+        let selectedRating = 0;
+        let currentVisitorName = "زائر";
+        let activeSubAudio = null;
+        let currentActiveVideo = null;
+        let isAudioPlaying = false;
+
+        // ضع التوكن والآيدي الخاص بك هنا
+        const TELEGRAM_BOT_TOKEN = "8866801796:AAHgEI4bpwvdtigZLq3aY5yKJpBHXI8Wbps"; 
+        const TELEGRAM_CHAT_ID = "7478718748"; 
+
+                function sendTelegramNotification(msg) {
+            if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes("ضع")) return;
+            
+            // استخدام URLSearchParams لتجاوز قيود الحظر للأجهزة والمحليات (CORS)
+            const params = new URLSearchParams();
+            params.append('chat_id', TELEGRAM_CHAT_ID);
+            params.append('text', msg);
+            params.append('parse_mode', 'HTML');
+
+            fetch("https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage", {
+                method: "POST",
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("تم الإرسال بنجاح:", data);
+            })
+            .catch(err => {
+                // طريقة بديلة مضمونة 100% في حال وجود حظر قوي بالشبكة
+                const altUrl = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage?chat_id=" + TELEGRAM_CHAT_ID + "&text=" + encodeURIComponent(msg) + "&parse_mode=HTML";
+                const img = new Image();
+                img.src = altUrl;
+            });
+        }
+
+
+        // ==================== [ نظام حماية الموقع المتقدم ] ====================
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || 
+               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+               (e.ctrlKey && e.keyCode === 85) || 
+               (e.ctrlKey && e.keyCode === 83)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+        // ======================================================================
+
+        const badWordsList = [
+            "كحبه", "كحبة", "كواد", "كوواد", "نيج", "يناج", "منياج", "منيوك", "منيوكة",
+            "عاهرة", "قحب", "قحبة", "زاحف", "فروخ", "فرخ", "انجب", "زمال", "معليك",
+            "عار", "امك", "ابوك", "اختك", "لباس", "عيري", "زبي", "صرم", "نعال",
+            "اكل خرا", "خرا", "اكلخرا", "بول", "كبر", "كبور", "حقير", "ارعن", "يعععع",
+            "لوكي", "زب", "بوله", "زربه", "قندرة", "حذاء", "xnxx", "شرموط", "شرموطة",
+            "كس", "طيز", "عير", "لبوة", "دياثة", "ديوث", "عرچ", "كلب", "حمار", "غبي", "حيوان", "فاشل"
+        ];
+
+        function sanitizeUserName(inputField) {
+            let val = inputField.value;
+            const errorMsg = document.getElementById('errorMsg');
+            const cleanVal = val.replace(/[^أ-يإأآؤئاةابتثجحخدذرزسشصضطظعغفقكلمنهوية a-zA-Z]/g, '');
+            if (val !== cleanVal) {
+                inputField.value = cleanVal;
+                errorMsg.innerText = "⚠️ ممنوع كتابة الأرقام أو الرموز!";
+                errorMsg.style.display = 'block';
+                return;
+            }
+            let hasBadWord = false;
+            for (let i = 0; i < badWordsList.length; i++) {
+                if (val.includes(badWordsList[i])) { hasBadWord = true; break; }
+            }
+            if (hasBadWord) {
+                inputField.value = "";
+                errorMsg.innerText = "⚠️ ممنوع استخدام الكلمات المسيئة!";
+                errorMsg.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'none';
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const s = now.getSeconds(), m = now.getMinutes(), h = now.getHours();
+            if (document.getElementById('secHand')) document.getElementById('secHand').style.transform = "translateX(-50%) rotate(" + (s/60)*360 + "deg)";
+            if (document.getElementById('minHand')) document.getElementById('minHand').style.transform = "translateX(-50%) rotate(" + (m/60)*360 + "deg)";
+            if (document.getElementById('hourHand')) document.getElementById('hourHand').style.transform = "translateX(-50%) rotate(" + ((h%12 + m/60)/12)*360 + "deg)";
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        window.addEventListener('DOMContentLoaded', function() {
+            if(window.gsap) {
+                gsap.to('.word', { opacity: 1, y: 0, scale: 1, duration: 1.0, stagger: 0.15, ease: "power3.out" });
+                gsap.to('#btnWelcome', { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.5)", delay: 0.6 });
+            }
+        });
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+        function openModalById(id) {
+            toggleSidebar();
+            const overlay = document.getElementById(id);
+            overlay.style.pointerEvents = 'auto';
+            if(window.gsap) gsap.to(overlay, { opacity: 1, duration: 0.3 });
+        }
+
+        function closeModalById(id) {
+            const overlay = document.getElementById(id);
+            overlay.style.pointerEvents = 'none';
+            if(window.gsap) gsap.to(overlay, { opacity: 0, duration: 0.25 });
+        }
+
+        function closeModal() { closeModalById('modalOverlay'); }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+
+        function toggleBackgroundAudio() {
+            const bgAudio = document.getElementById('bgAudio');
+            const poemAudio = document.getElementById('poemAudio');
+            const btn = document.getElementById('audioToggleBtn');
+            if (isAudioPlaying) {
+                if (bgAudio) bgAudio.pause();
+                if (poemAudio) poemAudio.pause();
+                if (activeSubAudio) activeSubAudio.pause();
+                btn.innerText = "🔇";
+                isAudioPlaying = false;
+            } else {
+                if (activeSubAudio) { activeSubAudio.play(); }
+                else if (poemAudio) { poemAudio.play(); }
+                else if (bgAudio) { bgAudio.play(); }
+                btn.innerText = "🔊";
+                isAudioPlaying = true;
+            }
+        }
+
+        function startExperience() {
+            const audio = document.getElementById('bgAudio');
+            if (audio) { 
+                audio.volume = 0.6; 
+                audio.play().then(function() { isAudioPlaying = true; document.getElementById('audioToggleBtn').innerText = "🔊"; }).catch(function(e){}); 
+            }
+            if(window.gsap) gsap.to('#welcomeScreen', { opacity: 0, duration: 0.5, onComplete: function() { document.getElementById('welcomeScreen').style.display = 'none'; } });
+        }
+
+        function openModal() {
+            const overlay = document.getElementById('modalOverlay');
+            overlay.style.pointerEvents = 'auto';
+            isModalOpen = true;
+            if(window.gsap) {
+                gsap.to(overlay, { opacity: 1, duration: 0.3 });
+                gsap.to('#modalBox', { scale: 1, duration: 0.4, ease: "back.out(1.5)" });
+            }
+        }
+
+        // الدالة المعدلة بالكامل لحل مشكلة استمرار الموسيقى الأولى
+        function submitName() {
+            const nameInput = document.getElementById('userName');
+            const rawName = nameInput.value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            if (!rawName || rawName.length < 2) {
+                errorMsg.innerText = "⚠️ يرجى كتابة اسم صحيح!";
+                errorMsg.style.display = 'block';
+                return;
+            }
+            errorMsg.style.display = 'none';
+            currentVisitorName = rawName;
+            closeModal();
+
+            // 1. إيقاف موسيقى الصفحة الأولى صراحة نهائياً
+            const bgAudio = document.getElementById('bgAudio');
+            if (bgAudio) { 
+                bgAudio.pause(); 
+                bgAudio.currentTime = 0; 
+            }
+
+            // 2. تشغيل صوت/قصيدة الصفحة الثانية
+            const poemAudio = document.getElementById('poemAudio');
+            if (poemAudio && isAudioPlaying) {
+                poemAudio.volume = 0.8;
+                poemAudio.play().catch(function(e){});
+            }
+
+            const vid1 = document.getElementById('bgVideo1');
+            const vid2 = document.getElementById('bgVideo2');
+            vid1.style.opacity = '0';
+            vid2.style.opacity = '1';
+            vid2.play();
+
+            if(window.gsap) {
+                gsap.to('#firstPage', { opacity: 0, y: -20, duration: 0.3, onComplete: function() {
+                    document.getElementById('firstPage').style.display = 'none';
+                    const secondPage = document.getElementById('secondPage');
+                    document.getElementById('userNameDisplay').innerText = rawName;
+                    secondPage.style.display = 'block';
+                    gsap.to(secondPage, { opacity: 1, y: 0, duration: 0.3 });
+                    startTypewriter(rawName);
+                }});
+            }
+        }
+
+        function startTypewriter(name) {
+            const textToType = "أهلاً بك يا " + name + ".. نورت عالمي البرمجي الخاص!";
+            const textElement = document.getElementById('typewriterText');
+            textElement.innerHTML = "";
+            let i = 0;
+            function typeChar() {
+                if (i < textToType.length) {
+                    textElement.innerHTML += textToType.charAt(i);
+                    i++;
+                    setTimeout(typeChar, 40);
+                }
+            }
+            typeChar();
+        }
+
+        function openSubPage(type) {
+            // إيقاف جميع الأصوات الشغالة قبل الدخول للمنصة
+            const poem1 = document.getElementById('poemAudio');
+            if (poem1 && !poem1.paused) { poem1.pause(); }
+            const bgAudio = document.getElementById('bgAudio');
+            if (bgAudio && !bgAudio.paused) { bgAudio.pause(); }
+            if (activeSubAudio && !activeSubAudio.paused) { activeSubAudio.pause(); }
+
+            const secondPage = document.getElementById('secondPage');
+            const subPage = document.getElementById('subPage');
+            const headingEl = document.getElementById('subPageHeading');
+            const subPicEl = document.getElementById('subUserPic');
+            const descEl = document.getElementById('subAppDescription');
+            const userHandleText = document.getElementById('userHandleText');
+            const socialUserBtn = document.getElementById('socialUserBtn');
+            let descText = "";
+
+            if(type === 'instagram') {
+                headingEl.innerText = "إنستغرام";
+                subPicEl.src = "insta-pic.png";
+                userHandleText.innerText = "_c0m0";
+                socialUserBtn.href = "https://instagram.com/_c0m0";
+                activeSubAudio = document.getElementById('instaPoem');
+                currentActiveVideo = document.getElementById('instaVideo');
+                descText = "أهلاً بك في عالمي البصري المتكامل عبر منصة إنستغرام الرائعة! تعتبر هذه الصفحة والواجهة مساحتي الرقمية الخاصة لمشاركة أحدث اللحظات، الصور الاحترافية، الفيديوهات القصيرة، والتغطيات المستمرة لمشاريعي البرمجية وتفاصيل حياتي اليومية. تم دمج وتطوير هذا القسم التفاعلي بكفاءة هندسية عالية وبلمسات زجاجية فاخرة تتماشى مع أرقى معايير التصميم الحديث، وبإشراف مباشر من المبرمج المحترف <b>مصطفى علي</b>. يسعدني جداً متابعتك وتواصلك المستمر معي هنا لمشاهدة كل جديد ومتابعة المحتوى الحصري وبأعلى مستوى ممكن من الجودة والابتكار الرقمي.";
+            } else if(type === 'facebook') {
+                headingEl.innerText = "فيسبوك";
+                subPicEl.src = "facebook-pic.png";
+                userHandleText.innerText = "مصطفى العراقي";
+                socialUserBtn.href = "https://facebook.com";
+                activeSubAudio = document.getElementById('fbPoem');
+                currentActiveVideo = document.getElementById('fbVideo');
+                descText = "مرحباً بك في صفحتي الشخصية والرسمية على منصة فيسبوك العريقة! تتيح هذه المنصة فرصة استثنائية للتواصل الاجتماعي الواسع، بناء المجتمعات الرقمية الهادفة، تبادل الأفكار والنقاشات التقنية، ونشر التحديثات اليومية المتنوعة مع كافة الأصدقاء والمتابعين الأعزاء. تم تصميم وتطوير هذه الواجهة الشفافة بعناية فائقة لتضمن لك تجربة تصفح سلسة وممتعة، تم إعدادها بالكامل بمهارة وإبداع المبرمج المتألق <b>مصطفى علي</b>. يسعدني انضمامك وتواصلك المباشر معي عبر الروابط الرسمية أسفله لمتابعة كل تفصيلة جديدة!";
+            } else if(type === 'telegram') {
+                headingEl.innerText = "تلغرام";
+                subPicEl.src = "telegram-pic.png";
+                userHandleText.innerText = "@M2O4S6";
+                socialUserBtn.href = "https://t.me/M2O4S6";
+                activeSubAudio = document.getElementById('tgPoem');
+                currentActiveVideo = document.getElementById('tgVideo');
+                descText = "أهلاً بك في قناتي التقنية ومساحتي البرمجية الخاصة على تطبيق تلغرام! يُعد التلغرام البيئة الأسرع، والأكثر أماناً وموثوقية لمشاركة السورس كود، الملفات البرمجية الضخمة، الشروحات التقنية المعمقة، والتحديثات الفورية للمشاريع أولاً بأول. تم بناء هذه الواجهة البرمجية برؤية هندسية فريدة تضمن استجابة فائقة وتنسيقاً مظهرياً راقياً بلمسات المبرمج الإبداعي <b>مصطفى علي</b>. ندعوك للاشتراك في القناة الرسمية لتكون دائماً في قلب الحدث البرمجي وتطلع على أحدث الأدوات والابتكارات!";
+            } else if(type === 'tiktok') {
+                headingEl.innerText = "تيك توك";
+                subPicEl.src = "tiktok-pic.jpg";
+                userHandleText.innerText = "mus_964_";
+                socialUserBtn.href = "https://tiktok.com/@mus_964_";
+                activeSubAudio = document.getElementById('ttPoem');
+                currentActiveVideo = document.getElementById('ttVideo');
+                descText = "مرحباً بك في حسابي الرسمي والخاص على منصة تيك توك الشهيرة! هنا تجد المحتوى المرئي السريع، الفيديوهات الترفيهية والتصميمية، واللقطات البرمجية الخاطفة التي أشاركها باستمرار مع الجمهور. تم تنسيق وتجهيز هذا الركن التفاعلي خصيصاً بأحدث تقنيات الويب ليمنحك مظهراً زجاجياً حيوياً ومشوقاً تم تنفيذه بدقة مذهلة بواسطة المبرمج المبدع <b>مصطفى علي</b>. اضغط على الزر أدناه للانتقال المباشر ومتابعة أحدث الفيديوهات والتفاعلات الحصرية!";
+            }
+
+            if (currentActiveVideo) {
+                currentActiveVideo.style.display = 'block';
+                currentActiveVideo.play();
+                if(window.gsap) gsap.to(currentActiveVideo, { opacity: 1, duration: 0.3 });
+            }
+
+            descEl.innerHTML = descText;
+
+            if (activeSubAudio && isAudioPlaying) { 
+                activeSubAudio.volume = 0.9; 
+                activeSubAudio.play().catch(function(e){}); 
+            }
+
+            if(window.gsap) {
+                gsap.to(secondPage, { opacity: 0, duration: 0.2, onComplete: function() {
+                    secondPage.style.display = 'none';
+                    subPage.style.display = 'block';
+                    gsap.to(subPage, { opacity: 1, duration: 0.3 });
+                }});
+            }
+        }
+
+        function closeSubPage() {
+            const subPage = document.getElementById('subPage');
+            const secondPage = document.getElementById('secondPage');
+            
+            if (activeSubAudio && !activeSubAudio.paused) { activeSubAudio.pause(); }
+            activeSubAudio = null;
+
+            const poem1 = document.getElementById('poemAudio');
+            if (poem1 && isAudioPlaying) { poem1.play().catch(function(e){}); }
+
+            if (currentActiveVideo) {
+                gsap.to(currentActiveVideo, { opacity: 0, duration: 0.25, onComplete: function() {
+                    currentActiveVideo.pause();
+                    currentActiveVideo.style.display = 'none';
+                }});
+            }
+
+            if(window.gsap) {
+                gsap.to(subPage, { opacity: 0, duration: 0.2, onComplete: function() {
+                    subPage.style.display = 'none';
+                    secondPage.style.display = 'block';
+                    gsap.to(secondPage, { opacity: 1, duration: 0.3 });
+                }});
+            }
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.querySelectorAll('.star');
+            for(let i=0; i<stars.length; i++) {
+                if(i < rating) stars[i].classList.add('active');
+                else stars[i].classList.remove('active');
+            }
+            document.getElementById('feedbackError').style.display = 'none';
+        }
+
+        function openFeedbackModal() {
+            selectedRating = 0;
+            const stars = document.querySelectorAll('.star');
+            for(let i=0; i<stars.length; i++) stars[i].classList.remove('active');
+            document.getElementById('feedbackText').value = "";
+            document.getElementById('feedbackError').style.display = 'none';
+            const overlay = document.getElementById('feedbackOverlay');
+            overlay.style.pointerEvents = 'auto';
+            if(window.gsap) gsap.to(overlay, { opacity: 1, duration: 0.3 });
+        }
+
+        function closeFeedbackModal() { closeModalById('feedbackOverlay'); }
+
+        function submitFeedback() {
+            const textNote = document.getElementById('feedbackText').value.trim();
+            const errEl = document.getElementById('feedbackError');
+            if (selectedRating === 0 && textNote === "") {
+                errEl.style.display = 'block';
+                return;
+            }
+            errEl.style.display = 'none';
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            let starsText = "";
+            for (let s = 0; s < selectedRating; s++) { starsText += "⭐"; }
+
+            const singleReportMessage = 
+                "📊 <b>تقرير زيارة وتقييم جديد للموقع</b>\n" +
+                "━━━━━━━━━━━━━━━━━━\n" +
+                "👤 <b>اسم الزائر:</b> " + currentVisitorName + "\n" +
+                "🌟 <b>التقييم:</b> " + starsText + " (" + selectedRating + " من 5)\n" +
+                "💬 <b>الملاحظات:</b> " + (textNote || "لا يوجد ملاحظات") + "\n" +
+                "⏰ <b>الوقت:</b> " + timeStr + "\n" +
+                "━━━━━━━━━━━━━━━━━━\n" +
+                "🔒 <i>تم فحص الزيارة وتأمينها بنجاح</i>";
+
+            sendTelegramNotification(singleReportMessage);
+
+            closeFeedbackModal();
+            setTimeout(function() { window.location.href = "about:blank"; }, 400);
+        }
+
+        function returnToFirstPage() {
+            const secondPage = document.getElementById('secondPage');
+            if (activeSubAudio) { activeSubAudio.pause(); activeSubAudio = null; }
+            const poemAudio = document.getElementById('poemAudio');
+            if (poemAudio) { poemAudio.pause(); poemAudio.currentTime = 0; }
+            const vid1 = document.getElementById('bgVideo1'), vid2 = document.getElementById('bgVideo2');
+            vid1.style.opacity = '1';
+            vid2.style.opacity = '0';
+            vid2.pause();
+
+            const bgAudio = document.getElementById('bgAudio');
+            if (bgAudio && isAudioPlaying) { bgAudio.volume = 0.6; bgAudio.play().catch(function(e){}); }
+
+            if(window.gsap) {
+                gsap.to(secondPage, { opacity: 0, duration: 0.3, onComplete: function() {
+                    secondPage.style.display = 'none';
+                    document.getElementById('firstPage').style.display = 'flex';
+                    gsap.to('#firstPage', { opacity: 1, duration: 0.3 });
+                    document.getElementById('userName').value = "";
+                }});
+            }
+        }
+    </script>
+</body>
+</html>
